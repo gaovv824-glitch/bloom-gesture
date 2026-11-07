@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Control a blooming flower with hand gestures in real-time using your webcam">
+    <title>指尖花园 · BloomGesture</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Webcam feed -->
+        <video id="webcam" autoplay playsinline></video>
+
+        <!-- Canvas overlay for rendering flower + hand skeleton -->
+        <canvas id="canvas"></canvas>
+
+        <!-- Subtle vignette -->
+        <div class="vignette"></div>
+
+        <!-- Loading screen -->
+        <div class="loading-overlay" id="loading">
+            <div class="loading-flower"></div>
+            <div class="loading-text">让花在指尖绽放</div>
+            <div class="loading-subtext">点击「开启摄像头」开始手势互动，或先试试演示模式</div>
+        </div>
+
+        <header class="garden-header">
+            <div class="brand"><span><strong>指尖花园</strong><small>让每一次挥手，都唤醒一片花海</small></span></div>
+            <div class="toolbar" aria-label="花园操作">
+                <button id="cameraButton" class="tool-button primary" type="button">开启摄像头</button>
+                <button id="demoButton" class="tool-button" type="button">演示模式：开</button>
+                <button id="clearButton" class="tool-button quiet" type="button">清空花园</button>
+            </div>
+        </header>
+
+        <div class="status-pill" id="status" role="status">演示模式 · 点击画面种下花朵</div>
+
+        <!-- Instructions -->
+        <div class="instructions" id="instructions">
+            <span>左手捏合</span>控制花朵开合 &nbsp;·&nbsp;
+            <span>右手捏合</span>控制生长 &nbsp;·&nbsp;
+            <span>张开手掌</span>触发绽放；点击画面种花
+        </div>
+    </div>
+
+    <!-- MediaPipe Hands -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.js" crossorigin="anonymous"></script>
+
+    <!-- Application -->
+    <script src="app.js"></script>
+</body>
+</html>

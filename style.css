@@ -1,0 +1,210 @@
+/* ============================================
+   FLOWER BLOOM - Hand Gesture Controller
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: #090b18;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+
+/* ---- Container ---- */
+.container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    isolation: isolate;
+    background: radial-gradient(ellipse at 50% 70%, #25223c 0%, #101322 48%, #080b15 100%);
+}
+
+/* ---- Webcam Video ---- */
+#webcam {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+    z-index: 1;
+    opacity: 0;
+    transition: opacity .8s ease;
+}
+
+#webcam.is-live { opacity: .72; }
+
+.garden-header {
+    position: absolute; inset: 24px 34px auto; z-index: 12;
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    pointer-events: none;
+}
+.brand, .toolbar { pointer-events: auto; }
+.brand { display: flex; align-items: center; gap: 12px; color: #fff2f7; text-shadow: 0 2px 20px #d995c4; }
+.brand strong { display: block; font-size: 17px; letter-spacing: .18em; }
+.brand small { display: block; margin-top: 4px; color: #f6d9e7aa; font-size: 11px; letter-spacing: .08em; }
+.toolbar { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 9px; }
+.tool-button { border: 1px solid #f4cee64a; border-radius: 999px; padding: 10px 16px; color: #fff2f8; background: #171525b8; backdrop-filter: blur(12px); font: inherit; font-size: 12px; cursor: pointer; transition: background .2s, transform .2s, border-color .2s; }
+.tool-button:hover { transform: translateY(-1px); border-color: #ffd8ecaa; background: #34263bbf; }
+.tool-button.primary { background: linear-gradient(120deg, #c875a3, #8b6db3); border-color: #ffe1ef80; }
+.tool-button.quiet { color: #f5ddecbb; }
+.status-pill { position: absolute; z-index: 10; top: 92px; left: 50%; transform: translateX(-50%); padding: 8px 15px; border: 1px solid #f7d4e52b; border-radius: 999px; color: #f7e5ef; background: #1113238c; backdrop-filter: blur(10px); font-size: 11px; letter-spacing: .04em; white-space: nowrap; }
+.status-pill[hidden] { display: none; }
+.status-pill.flash { animation: status-flash .8s ease; }
+@keyframes status-flash { 50% { color: #fff; box-shadow: 0 0 28px #ffb9e488; } }
+
+/* ---- Canvas Overlay ---- */
+#canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: scaleX(-1);
+    z-index: 3;
+    pointer-events: auto;
+}
+
+/* ---- Loading Screen ---- */
+.loading-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 8;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at center, #1a0a1e 0%, #0a0510 60%, #000 100%);
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+.loading-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.loading-flower {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.loading-flower::before {
+    content: '✿';
+    font-size: 60px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: bloom-pulse 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 15px rgba(255, 120, 180, 0.8));
+}
+
+@keyframes bloom-pulse {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0.6;
+        filter: drop-shadow(0 0 10px rgba(255, 120, 180, 0.5));
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 1;
+        filter: drop-shadow(0 0 25px rgba(255, 120, 180, 1));
+    }
+}
+
+.loading-text {
+    color: rgba(255, 200, 220, 0.9);
+    font-size: 16px;
+    font-weight: 300;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    animation: text-fade 2s ease-in-out infinite;
+}
+
+.loading-subtext {
+    color: rgba(255, 180, 200, 0.5);
+    font-size: 12px;
+    font-weight: 300;
+    letter-spacing: 2px;
+    margin-top: 10px;
+}
+
+@keyframes text-fade {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* ---- Instruction Toast ---- */
+.instructions {
+    position: absolute;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 150, 200, 0.2);
+    border-radius: 16px;
+    padding: 16px 28px;
+    color: rgba(255, 220, 240, 0.9);
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    text-align: center;
+    line-height: 1.6;
+    max-width: min(760px, calc(100vw - 28px));
+    transition: opacity 1s ease, transform 1s ease;
+    box-shadow: 0 8px 32px rgba(255, 100, 150, 0.1);
+}
+
+@media (max-width: 640px) {
+    .garden-header { inset: 14px 14px auto; align-items: flex-start; flex-direction: column; gap: 12px; }
+    .brand small { font-size: 10px; }
+    .toolbar { justify-content: flex-start; gap: 7px; }
+    .tool-button { padding: 9px 12px; font-size: 11px; }
+    .status-pill { top: 112px; max-width: calc(100vw - 24px); overflow: hidden; text-overflow: ellipsis; }
+    .instructions { bottom: 12px; padding: 11px 15px; font-size: 11px; }
+    .vignette { background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.3) 100%); }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+}
+
+.instructions.hidden {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+    pointer-events: none;
+}
+
+.instructions span {
+    color: rgba(255, 160, 200, 1);
+    font-weight: 600;
+}
+
+/* ---- Vignette ---- */
+.vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    background: radial-gradient(
+        ellipse at center,
+        transparent 50%,
+        rgba(0, 0, 0, 0.4) 100%
+    );
+}
